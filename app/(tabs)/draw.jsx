@@ -5,18 +5,19 @@ import { Svg, Path } from 'react-native-svg';
 const { height, width } = Dimensions.get('window');
 
 const kana = [
-  // 'a', 'i', 'u', 'e', 'o',
+  'a', 'i', 'u', 'e', 'o',
   'ka', 'ki', 'ku', 'ke', 'ko',
-  // 'sa', 'shi', 'su', 'se', 'so',
-  // 'ta', 'chi', 'tsu', 'te', 'to',
-  // 'na', 'ni', 'nu' ,'ne', 'no',
-  // 'ha', 'hi', 'fu', 'he', 'ho',
+  'sa', 'shi', 'su', 'se', 'so',
+  'ta', 'chi', 'tsu', 'te', 'to',
+  'na', 'ni', 'nu' ,'ne', 'no',
+  'ha', 'hi', 'fu', 'he', 'ho',
   'ma', 'mi', 'mu', 'me', 'mo',
-  // 'ya', 'yu', 'yo',
+  'ya', 'yu', 'yo',
   'ra', 'ri', 'ru', 're', 'ro',
   'wa', 'wo',
   'n'
 ];
+
 const katakanaFile = {
   a: require('../../assets/katakana/a.png'),
   i: require('../../assets/katakana/i.png'),
@@ -66,11 +67,65 @@ const katakanaFile = {
   n: require('../../assets/katakana/n.png'),
 };
 
+const hiraganaFile = {
+  a: require('../../assets/hiragana/a.png'),
+  i: require('../../assets/hiragana/i.png'),
+  u: require('../../assets/hiragana/u.png'),
+  e: require('../../assets/hiragana/e.png'),
+  o: require('../../assets/hiragana/o.png'),
+  ka: require('../../assets/hiragana/ka.png'),
+  ki: require('../../assets/hiragana/ki.png'),
+  ku: require('../../assets/hiragana/ku.png'),
+  ke: require('../../assets/hiragana/ke.png'),
+  ko: require('../../assets/hiragana/ko.png'),
+  sa: require('../../assets/hiragana/sa.png'),
+  shi: require('../../assets/hiragana/shi.png'),
+  su: require('../../assets/hiragana/su.png'),
+  se: require('../../assets/hiragana/se.png'),
+  so: require('../../assets/hiragana/so.png'),
+  ta: require('../../assets/hiragana/ta.png'),
+  chi: require('../../assets/hiragana/chi.png'),
+  tsu: require('../../assets/hiragana/tsu.png'),
+  te: require('../../assets/hiragana/te.png'),
+  to: require('../../assets/hiragana/to.png'),
+  na: require('../../assets/hiragana/na.png'),
+  ni: require('../../assets/hiragana/ni.png'),
+  nu: require('../../assets/hiragana/nu.png'),
+  ne: require('../../assets/hiragana/ne.png'),
+  no: require('../../assets/hiragana/no.png'),
+  ha: require('../../assets/hiragana/ha.png'),
+  hi: require('../../assets/hiragana/hi.png'),
+  fu: require('../../assets/hiragana/fu.png'),
+  he: require('../../assets/hiragana/he.png'),
+  ho: require('../../assets/hiragana/ho.png'),
+  ma: require('../../assets/hiragana/ma.png'),
+  mi: require('../../assets/hiragana/mi.png'),
+  mu: require('../../assets/hiragana/mu.png'),
+  me: require('../../assets/hiragana/me.png'),
+  mo: require('../../assets/hiragana/mo.png'),
+  ya: require('../../assets/hiragana/ya.png'),
+  yu: require('../../assets/hiragana/yu.png'),
+  yo: require('../../assets/hiragana/yo.png'),
+  ra: require('../../assets/hiragana/ra.png'),
+  ri: require('../../assets/hiragana/ri.png'),
+  ru: require('../../assets/hiragana/ru.png'),
+  re: require('../../assets/hiragana/re.png'),
+  ro: require('../../assets/hiragana/ro.png'),
+  wa: require('../../assets/hiragana/wa.png'),
+  wo: require('../../assets/hiragana/wo.png'),
+  n: require('../../assets/hiragana/n.png'),
+}
+
 
 const GameStates = Object.freeze({
   PRESTART: 1,
   ONGOING: 2,
   FINISHED: 3,
+})
+
+const KanaSets = Object.freeze({
+  KATAKANA: 0,
+  HIRAGANA: 1,
 })
 
 
@@ -103,6 +158,32 @@ export default () => {
     }
   };
 
+
+  const [kanaSet, setKanaSet] = useState(KanaSets.HIRAGANA);
+  const KanaSelect = () =>
+  {
+    return <View>
+      <View style = {{flexDirection: 'row', marginHorizontal: 20}}>
+        <TouchableOpacity style={
+          [styles.button,
+            kanaSet == KanaSets.HIRAGANA && styles.activeButton
+          ]}
+          onPress={()=>{setKanaSet(KanaSets.HIRAGANA)}}>
+            <Text style={styles.buttonText}>Hiragana</Text>
+        </TouchableOpacity>
+        <View style = {{width: 20}}/>
+        <TouchableOpacity style={
+          [styles.button,
+            kanaSet == KanaSets.KATAKANA && styles.activeButton
+          ]} 
+          onPress={()=>{setKanaSet(KanaSets.KATAKANA)}}>
+            <Text style={styles.buttonText}>Katakana</Text>
+        </TouchableOpacity>
+        
+      </View>
+    </View>
+  }
+
   const extractCoordinates = (event) => {
     if (event.nativeEvent.touches && event.nativeEvent.touches.length > 0) {
       // Touch event (mobile)
@@ -125,6 +206,7 @@ export default () => {
 
   const handleShowAnswerClick = () => {
     setReveal(true);
+    console.log(kanaSet);
   }
 
   const changeCharacter = () => 
@@ -147,7 +229,7 @@ export default () => {
     setKanaLeft(newKanaArray);
     if(kanaLeft.length - 1 <= 0)
     {
-      setGameState(GameStates.FINISHED)
+      endGame();
     }
     else
     {
@@ -170,7 +252,13 @@ export default () => {
       setCorrect(0);
       setTested(0);
       setReveal(false)
+      changeCharacter();
     }
+
+  const endGame = () =>
+  {
+    setGameState(GameStates.FINISHED);
+  }
 
   const [numTested, setTested] = useState(0);
   const [numCorrect, setCorrect] = useState(0);
@@ -182,9 +270,19 @@ export default () => {
   {
     if(answerRevealed)
       {
+        const kanaName = (kanaLeft[currCharIndex]);
+        var kanaFile;
+        if(kanaSet == KanaSets.HIRAGANA)
+        {
+          kanaFile = hiraganaFile[kanaName];
+        }
+        else
+        {
+          kanaFile = katakanaFile[kanaName];
+        }
       return <Image
         style={styles.overlayImage}
-        source={katakanaFile[kanaLeft[currCharIndex]]}
+        source={kanaFile}
       />
       } 
   }
@@ -220,6 +318,11 @@ export default () => {
             <Text style={styles.buttonText}>Clear</Text>
           </TouchableOpacity>
         </View>
+        <View style = {{flexDirection: 'row', justifyContent: 'center', marginHorizontal: 20}}>
+          <TouchableOpacity style={styles.button} onPress={endGame}>
+            <Text style={styles.buttonText}>End Game</Text>
+          </TouchableOpacity>
+        </View>
         
 
       </View>
@@ -234,6 +337,7 @@ export default () => {
           <TouchableOpacity style={styles.button} onPress={startGame}>
             <Text style={styles.buttonText}>Start Game</Text>
           </TouchableOpacity>
+          <KanaSelect/>
         </View>
       );
     case GameStates.FINISHED:
@@ -243,6 +347,7 @@ export default () => {
           <TouchableOpacity style={styles.button} onPress={startGame}>
             <Text style={styles.buttonText}>Restart</Text>
           </TouchableOpacity>
+          <KanaSelect/>
         </View>
       )
     case GameStates.ONGOING:
@@ -334,7 +439,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
-    
+  },
+  activeButton: {
+    backgroundColor: 'blue'
   },
   buttonText: {
     color: 'white',
